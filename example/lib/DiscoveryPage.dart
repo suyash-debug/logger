@@ -1,4 +1,6 @@
 import 'dart:async';
+import 'dart:convert';
+import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bluetooth_serial/flutter_bluetooth_serial.dart';
@@ -104,8 +106,11 @@ class _DiscoveryPage extends State<DiscoveryPage> {
           return BluetoothDeviceListEntry(
             device: device,
             rssi: result.rssi,
-            onTap: () {
-              Navigator.of(context).pop(result.device);
+            onTap: () async* {
+              // Navigator.of(context).pop(result.device);
+              BluetoothConnection connection =
+                  await BluetoothConnection.toAddress(address);
+              print('Connected to the device');
             },
             onLongPress: () async {
               try {
@@ -121,6 +126,12 @@ class _DiscoveryPage extends State<DiscoveryPage> {
                       .bondDeviceAtAddress(address))!;
                   print(
                       'Bonding with ${device.address} has ${bonded ? 'succed' : 'failed'}.');
+                  print("heloow");
+                  BluetoothConnection connection =
+                      await BluetoothConnection.toAddress(address);
+                  print(connection.input?.listen((Uint8List data) {
+                    print('Data incoming: ${ascii.decode(data)}');
+                  }));
                 }
                 setState(() {
                   results[results.indexOf(result)] = BluetoothDiscoveryResult(
